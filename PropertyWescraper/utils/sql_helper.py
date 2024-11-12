@@ -9,4 +9,14 @@ class MysqlConnector:
 def build_db_tables_for_install():
     engine = MysqlConnector()
     with engine.sql_engine.connect() as connection:
-        connection.execute(text("CREATE TABLE example (id INTEGER, name VARCHAR(20))"))
+        connection.execute(text("CREATE TABLE new_properties (unique_id1 VARCHAR(20), "
+                                "unique_id2 int, "
+                                "title VARCHAR(30), "
+                                "price VARCHAR(30),"
+                                "parish VARCHAR(20),"
+                                "bedrooms int, "
+                                "bathrooms int, "
+                                "dateAdded DATE)"))
+
+if __name__ == "__main__":
+    build_db_tables_for_install()

@@ -2,9 +2,9 @@ from bs4 import BeautifulSoup
 import requests
 from datetime import datetime
 import csv
-import config
+from config import WebData
 
-page = requests.get(config.URL)
+page = requests.get(WebData.URL)
 
 soup = BeautifulSoup(page.content, "html.parser")
 results = soup.find(class_="property-grid__items")
@@ -31,7 +31,7 @@ new_listings = [
     for job in job_cards
 ]
 
-with open(config.file_out, newline='\n', mode="a+") as file:
+with open(WebData.file_out, newline='\n', mode="a+") as file:
     headers = [head for head in new_listings[0].keys()]
     writer = csv.DictWriter(file, fieldnames=headers)
     how_many_added = 0
