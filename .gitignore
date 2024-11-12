@@ -163,4 +163,5 @@ cython_debug/
 #.idea/
 
 config.py
+fileout/
 tests/
