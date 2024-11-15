@@ -4,7 +4,7 @@ from datetime import datetime
 import csv
 from config import WebData
 
-page = requests.get(WebData.URL)
+page = requests.get(WebData.URL_new)
 
 soup = BeautifulSoup(page.content, "html.parser")
 results = soup.find(class_="property-grid__items")
