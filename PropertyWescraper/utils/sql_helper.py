@@ -6,32 +6,34 @@ from sqlalchemy import (create_engine,
 from config import SqlDetails
 from sqlalchemy.engine import result
 
+# from tests.testfiles import new_listings
+
+
 class MysqlConnector:
 
     def __init__(self, table_name=None):
         self.sql_engine = create_engine(SqlDetails.db_driver)
         self.table_name = table_name
 
-    def select_data(self):
+    def select_data(self, values: list):
         meta_data = MetaData()
         meta_data.reflect(bind=self.sql_engine)
         new_properties = meta_data.tables[self.table_name]
-        query = select(new_properties)
-        for col in query.columns:
-            print(col)
+        query = select(new_properties.c.unique_id1).where(new_properties.c.unique_id1.in_(values))
+        #for col in query.columns:
+        #    print(col)
 
         with self.sql_engine.connect() as conn:
-            for row in conn.execute(query):
-                print(row)
+            return [value[0] for value in conn.execute(query).fetchall()]
 
-    def insert_data(self):
+    def insert_data(self, *args):
         meta_data = MetaData()
         meta_data.reflect(bind=self.sql_engine)
-        new_properties = meta_data.tables[self.table_name]
-        stmt = insert(new_properties).values(id="12345", title="Testing")
+        insert_to_table = meta_data.tables[self.table_name]
+        query_stmt_add = insert(insert_to_table).values(*args)
 
         with self.sql_engine.connect() as conn:
-            result = conn.execute(stmt)
+            conn.execute(query_stmt_add)
             conn.commit()
 
 def build_db_tables_for_install():
@@ -53,5 +55,5 @@ def build_db_tables_for_install():
     meta_data.create_all(engine.sql_engine.connect())
 
 if __name__ == "__main__":
-    test = MysqlConnector()
-    test.insert_data()
+    test = MysqlConnector("new_properties")
+    test.select_data()
