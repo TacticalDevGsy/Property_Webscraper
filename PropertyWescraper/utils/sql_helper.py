@@ -49,7 +49,8 @@ def build_db_tables_for_install():
                            Column("parish", String(20)),
                            Column("bedrooms", Integer),
                            Column("bathrooms", Integer),
-                           Column("dateAdded", Date)
+                           Column("dateAdded", Date),
+                           Column("imageName", String(20))
     )
 
     meta_data.create_all(engine.sql_engine.connect())

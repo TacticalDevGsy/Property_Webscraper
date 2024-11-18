@@ -1,7 +1,11 @@
+from fileinput import filename
+from os.path import exists
+
 from bs4 import BeautifulSoup
 import requests
 from datetime import datetime
 import csv
+from string import punctuation
 
 from PropertyWescraper.utils.sql_helper import MysqlConnector
 from config import WebData
@@ -11,9 +15,27 @@ def load_data_from_html(url_to_scrape):
     page = requests.get(url_to_scrape)
     return BeautifulSoup(page.content, "html.parser")
 
-def extract_job_details(job):
+def download_image(response, filename_in):
+    filename = filename_strip(filename_in)
+    if not exists(f'./property_images/{filename}'):
+        with open(f'./property_images/{filename}', 'wb') as out_file:
+            for chunk in response.iter_content(1024):
+                out_file.write(chunk)
 
+    return filename
+
+def filename_strip(filename: str):
+    for char in punctuation:
+        filename = filename.replace(char, ' ').replace(' ','')
+
+    return f"{filename}.jpg"
+
+def extract_job_details(job):
     title_div = job.find("div", class_="property-grid__item-title")
+
+    image = job.find("div", class_="property-grid__item-image").find("img")["src"]
+    image_filename = download_image(requests.get(image), title_div.find("a").text.strip())
+
     unique_id = title_div.find("a", class_="property--favourite")
 
     return {
@@ -25,6 +47,7 @@ def extract_job_details(job):
         "bedrooms": job.find("span", class_="property-grid__item-bedrooms").text.strip(),
         "bathrooms": job.find("span", class_="property-grid__item-bathrooms").text.strip(),
         "dateAdded": datetime.now().strftime("%Y-%m-%d"),
+        "imageName": image_filename
     }
 
 def get_new_listings():
